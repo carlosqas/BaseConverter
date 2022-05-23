@@ -1,0 +1,249 @@
+EMU8086 GENERATED LISTING. MACHINE CODE <- SOURCE.
+ 
+cnvBase.com -- emu8086 assembler version: 4.08  
+ 
+[ 22/05/2022  --  20:15:32 ] 
+ 
+===================================================================================================
+[LINE]     LOC: MACHINE CODE                          SOURCE
+===================================================================================================
+ 
+[   1]        :                                       ; Macro que realiza o print de uma string comum.
+[   2]        :                                       macro print address
+[   3]        :                                       push AX
+[   4]        :                                       push DX
+[   5]        :                                       
+[   6]        :                                       mov AH, 09h
+[   7]        :                                       mov DX, address
+[   8]        :                                       int 21h
+[   9]        :                                       
+[  10]        :                                       pop DX
+[  11]        :                                       pop AX
+[  12]        :                                       endm
+[  13]        :                                       
+[  14]        :                                       ; Macro que recebe o input do usuario.
+[  15]        :                                       macro input address
+[  16]        :                                       push AX
+[  17]        :                                       push DX
+[  18]        :                                       
+[  19]        :                                       mov AH, 0Ah
+[  20]        :                                       mov DX, address
+[  21]        :                                       int 21h
+[  22]        :                                       
+[  23]        :                                       pop DX
+[  24]        :                                       pop AX
+[  25]        :                                       endm
+[  26]        :                                       
+[  27]        :                                       ; Macro que pula linha.
+[  28]        :                                       macro breakLine
+[  29]        :                                       push AX
+[  30]        :                                       push DX
+[  31]        :                                       
+[  32]        :                                       mov AH, 09h
+[  33]        :                                       mov DX, bufferLfcr
+[  34]        :                                       int 21h
+[  35]        :                                       
+[  36]        :                                       pop DX
+[  37]        :                                       pop AX
+[  38]        :                                       endm
+[  39]        :                                       
+[  40]        :                                       ; Programa principal
+[  41]        :                                       org 100h
+[  42]        :                                       
+[  43]    0100:                                       requestBase:
+[  44]    0100: 50 52 B4 09 BA 6D 02 CD 21 5A 58      print bufferReqDestBase
+[  45]    010B: E8 1D 00                              call receiveBase
+[  46]    010E: A0 02 06                              mov AL, [602h]
+[  47]    0111: 3C 00                                 cmp AL, 0
+[  48]    0113: 74 EB                                 je requestBase
+[  49]        :                                       
+[  50]    0115:                                       requestNumber:
+[  51]    0115: 50 52 B4 09 BA 91 02 CD 21 5A 58      print bufferReqValue
+[  52]    0120: E8 A7 00                              call receiveNumber
+[  53]    0123: A0 02 06                              mov AL, [602h]
+[  54]    0126: 3C 00                                 cmp AL, 0
+[  55]    0128: 74 EB                                 je requestNumber
+[  56]        :                                       
+[  57]        :                                       ; Fazer funcao que converte da base decimal para a base solicitada
+[  58]        :                                       
+[  59]    012A: C3                                    ret
+[  60]        :                                       
+[  61]        :                                       ; Funcoes
+[  62]    012B:                                       receiveBase:
+[  63]    012B: 50                                    push AX
+[  64]    012C: 53                                    push BX
+[  65]    012D: 51                                    push CX
+[  66]    012E: 52                                    push DX
+[  67]        :                                       
+[  68]        :                                       ; Inicializacao da memoria para a regra de negocio
+[  69]    012F: BE DC 02                              mov SI, bufferBase
+[  70]    0132: B3 0A                                 mov BL, 0Ah   ; 0h30 = '0'
+[  71]    0134: C6 06 00 06 00                        mov [600h], 0 ; Endereco de memoria que ficara armazenado o valor da base
+[  72]    0139: C6 06 01 06 00                        mov [601h], 0 ; Endereco de memoria que ficara armazenado o tamanho da string
+[  73]    013E: C6 06 02 06 01                        mov [602h], 1 ; Caso o funcao detecte erro, ira retornar o booleano aqui
+[  74]        :                                       
+[  75]        :                                       ; Pegar o valor do usuario.
+[  76]    0143: 50 52 B4 0A BA DC 02 CD 21 5A 58      input bufferBase
+[  77]        :                                       
+[  78]        :                                       ; Obtem o tamanho da string digitada pelo usuario
+[  79]    014E:                                       BaseStringSizeLoop:
+[  80]    014E: 8A 44 02                              mov AL, [SI+2]
+[  81]    0151: FE 06 01 06                           inc [601h]
+[  82]    0155: 46                                    inc SI
+[  83]    0156: 3C 0D                                 cmp AL, 0Dh
+[  84]    0158: 75 F4                                 jne BaseStringSizeLoop
+[  85]    015A: FE 0E 01 06                           dec [601h]
+[  86]        :                                       
+[  87]        :                                       ; Verificar se e um numero de fato.
+[  88]    015E: BE DC 02                              mov SI, bufferBase
+[  89]    0161: 8A 16 01 06                           mov DL, [601h]
+[  90]        :                                       
+[  91]    0165:                                       BaseVerifyLoop:
+[  92]    0165: 8A 44 02                              mov AL, [SI+2]
+[  93]    0168: 3C 30                                 cmp AL, 30h
+[  94]    016A: 73 03 E9 E1 00                        jb invalidNumberMessage ; Caracter digitado menor do que 30h
+[  95]    016F: 3C 39                                 cmp AL, 39h
+[  96]    0171: 76 03 E9 DA 00                        ja invalidNumberMessage ; Caracter digitado maior do que 39h
+[  97]    0176: FE CA                                 dec DL
+[  98]    0178: 46                                    inc SI
+[  99]    0179: 80 FA 00                              cmp DL, 0
+[ 100]    017C: 77 E7                                 ja BaseVerifyLoop
+[ 101]        :                                       
+[ 102]        :                                       ; Converte para um numero
+[ 103]    017E: BE DC 02                              mov SI, bufferBase
+[ 104]    0181: B8 00 00                              mov AX, 0
+[ 105]    0184: B9 00 00                              mov CX, 0
+[ 106]        :                                       
+[ 107]    0187:                                       BaseConvertLoop:
+[ 108]    0187: 8A 44 02                              mov AL, [SI+2]
+[ 109]    018A: 2C 30                                 sub AL, 30h
+[ 110]    018C: 80 3E 01 06 01                        cmp [601h], 1
+[ 111]    0191: 77 2A                                 ja BaseMultiplyAL
+[ 112]    0193: 03 C8                                 add CX, AX
+[ 113]    0195: 89 0E 00 06                           mov [600h], CX
+[ 114]        :                                       
+[ 115]        :                                       ; Verificar se esta entre 2 e 16.
+[ 116]    0199: B8 00 00                              mov AX, 0
+[ 117]    019C: A0 00 06                              mov AL, [600h]
+[ 118]    019F: 3C 02                                 cmp AL, 02h
+[ 119]    01A1: 73 03 E9 AA 00                        jb invalidNumberMessage
+[ 120]    01A6: 3C 10                                 cmp AL, 10h
+[ 121]    01A8: 76 03 E9 A3 00                        ja invalidNumberMessage
+[ 122]        :                                       
+[ 123]    01AD:                                       EndBaseFunction:
+[ 124]    01AD: 5A                                    pop DX
+[ 125]    01AE: 59                                    pop CX
+[ 126]    01AF: 5B                                    pop BX
+[ 127]    01B0: 58                                    pop AX
+[ 128]    01B1: 50 52 B4 09 BA D9 02 CD 21 5A 58      breakline
+[ 129]    01BC: C3                                    ret
+[ 130]        :                                       
+[ 131]    01BD:                                       BaseMultiplyAL:
+[ 132]    01BD: 03 C1                                 add AX, CX
+[ 133]    01BF: F6 E3                                 mul BL
+[ 134]    01C1: 8B C8                                 mov CX, AX
+[ 135]    01C3: 46                                    inc SI
+[ 136]    01C4: FE 0E 01 06                           dec [601h]
+[ 137]    01C8: EB BD                                 jmp BaseConvertLoop
+[ 138]        :                                       
+[ 139]        :                                       
+[ 140]        :                                       
+[ 141]    01CA:                                       receiveNumber:
+[ 142]    01CA: 50                                    push AX
+[ 143]    01CB: 53                                    push BX
+[ 144]    01CC: 51                                    push CX
+[ 145]    01CD: 52                                    push DX
+[ 146]        :                                       
+[ 147]        :                                       ; Inicializacao da memoria para a regra de negocio
+[ 148]    01CE: BE E1 02                              mov SI, bufferValue
+[ 149]    01D1: BB 0A 00                              mov BX, 0Ah
+[ 150]    01D4: C6 06 02 06 01                        mov [602h], 1 ; Caso o funcao detecte erro, ira retornar o booleano aqui
+[ 151]    01D9: C6 06 10 06 00                        mov [610h], 0 ; Endereco de memoria que ficara armazenado o valor da base
+[ 152]    01DE: C6 06 12 06 00                        mov [612h], 0 ; Endereco de memoria que ficara armazenado o tamanho da string
+[ 153]        :                                       
+[ 154]        :                                       ; Pegar o valor do usuario.
+[ 155]    01E3: 50 52 B4 0A BA E1 02 CD 21 5A 58      input bufferValue
+[ 156]        :                                       
+[ 157]        :                                       ; Obtem o tamanho da string digitada pelo usuario
+[ 158]    01EE:                                       stringSizeLoop:
+[ 159]    01EE: 8A 44 02                              mov AL, [SI+2]
+[ 160]    01F1: FE 06 12 06                           inc [612h]
+[ 161]    01F5: 46                                    inc SI
+[ 162]    01F6: 3C 0D                                 cmp AL, 0Dh
+[ 163]    01F8: 75 F4                                 jne stringSizeLoop
+[ 164]    01FA: FE 0E 12 06                           dec [612h]
+[ 165]        :                                       
+[ 166]        :                                       ; Verificar se e um numero de fato.
+[ 167]    01FE: BE E1 02                              mov SI, bufferValue
+[ 168]    0201: 8A 16 12 06                           mov DL, [612h]
+[ 169]        :                                       
+[ 170]    0205:                                       verifyLoop:
+[ 171]    0205: 8A 44 02                              mov AL, [SI+2]
+[ 172]    0208: 3C 30                                 cmp AL, 30h
+[ 173]    020A: 72 44                                 jb invalidNumberMessage ; Caracter digitado menor do que 30h
+[ 174]    020C: 3C 39                                 cmp AL, 39h
+[ 175]    020E: 77 40                                 ja invalidNumberMessage ; Caracter digitado maior do que 39h
+[ 176]    0210: FE CA                                 dec DL
+[ 177]    0212: 46                                    inc SI
+[ 178]    0213: 80 FA 00                              cmp DL, 0
+[ 179]    0216: 77 ED                                 ja verifyLoop
+[ 180]        :                                       
+[ 181]        :                                       ; Converte para um numero
+[ 182]    0218: BE E1 02                              mov SI, bufferValue
+[ 183]    021B: B9 00 00                              mov CX, 0
+[ 184]        :                                       
+[ 185]    021E:                                       convertLoop:
+[ 186]    021E: B8 00 00                              mov AX, 0
+[ 187]    0221: 8A 44 02                              mov AL, [SI+2]
+[ 188]    0224: 2C 30                                 sub AL, 30h
+[ 189]    0226: 80 3E 12 06 01                        cmp [612h], 1
+[ 190]    022B: 77 16                                 ja multiplyAL
+[ 191]    022D: 03 C8                                 add CX, AX
+[ 192]    022F: 89 0E 10 06                           mov [610h], CX
+[ 193]        :                                       
+[ 194]    0233:                                       continue:
+[ 195]    0233: 5A                                    pop DX
+[ 196]    0234: 59                                    pop CX
+[ 197]    0235: 5B                                    pop BX
+[ 198]    0236: 58                                    pop AX
+[ 199]    0237: 50 52 B4 09 BA D9 02 CD 21 5A 58      breakline
+[ 200]    0242: C3                                    ret
+[ 201]        :                                       
+[ 202]    0243:                                       multiplyAL:
+[ 203]    0243: 03 C1                                 add AX, CX
+[ 204]    0245: F7 E3                                 mul BX
+[ 205]    0247: 8B C8                                 mov CX, AX
+[ 206]    0249: 46                                    inc SI
+[ 207]    024A: FE 0E 12 06                           dec [612h]
+[ 208]    024E: EB CE                                 jmp convertLoop
+[ 209]        :                                       
+[ 210]    0250:                                       invalidNumberMessage:
+[ 211]    0250: 50 52 B4 09 BA D9 02 CD 21 5A 58      breakLine
+[ 212]    025B: 50 52 B4 09 BA BF 02 CD 21 5A 58      print bufferInvalidNumber
+[ 213]    0266: C6 06 02 06 00                        mov [602h], 0
+[ 214]    026B: EB C6                                 jmp continue
+[ 215]        :                                       
+[ 216]        :                                       ; Buffers
+[ 217]    026D: 44 69 67 69 74 65 20 61 20 62 61 73   bufferReqDestBase: db "Digite a base de destino (2 a 16): $"
+                65 20 64 65 20 64 65 73 74 69 6E 6F 
+                20 28 32 20 61 20 31 36 29 3A 20 24 
+                                                    
+[ 218]    0291: 44 69 67 69 74 65 20 6F 20 6E 75 6D   bufferReqValue: db "Digite o numero em base decimal (0 a 65535): $"
+                65 72 6F 20 65 6D 20 62 61 73 65 20 
+                64 65 63 69 6D 61 6C 20 28 30 20 61 
+                20 36 35 35 33 35 29 3A 20 24       
+[ 219]    02BF: 4E 75 6D 65 72 6F 20 64 69 67 69 74   bufferInvalidNumber: db "Numero digitado invalido!$"
+                61 64 6F 20 69 6E 76 61 6C 69 64 6F 
+                21 24                               
+[ 220]    02D9: 0D 0A 24                              bufferLfcr: db 13, 10, '$'
+[ 221]    02DC: 03 00 24 24 24                        bufferBase: db 3, 0, 3 dup('$')
+[ 222]    02E1: 06 00 24 24 24 24 24 24               bufferValue: db 6, 0, 6 dup('$')
+[ 223]        :                                       
+ 
+===================================================================================================
+ 
+
+
+
+
+===================================================================================================

@@ -1,0 +1,29 @@
+< THE SYMBOL TABLE >  cnvBase.com  --  emu8086 assembler version: 4.08 
+===================================================================================================
+Name                     	Offset    	Size      	Type      	Segment   
+===================================================================================================
+REQUESTBASE              	00100     	-1        	LABEL     	(NOSEG)   
+REQUESTNUMBER            	00115     	-1        	LABEL     	(NOSEG)   
+RECEIVEBASE              	0012B     	-1        	LABEL     	(NOSEG)   
+BASESTRINGSIZELOOP       	0014E     	-1        	LABEL     	(NOSEG)   
+BASEVERIFYLOOP           	00165     	-1        	LABEL     	(NOSEG)   
+BASECONVERTLOOP          	00187     	-1        	LABEL     	(NOSEG)   
+ENDBASEFUNCTION          	001AD     	-1        	LABEL     	(NOSEG)   
+BASEMULTIPLYAL           	001BD     	-1        	LABEL     	(NOSEG)   
+RECEIVENUMBER            	001CA     	-1        	LABEL     	(NOSEG)   
+STRINGSIZELOOP           	001EE     	-1        	LABEL     	(NOSEG)   
+VERIFYLOOP               	00205     	-1        	LABEL     	(NOSEG)   
+CONVERTLOOP              	0021E     	-1        	LABEL     	(NOSEG)   
+CONTINUE                 	00233     	-1        	LABEL     	(NOSEG)   
+MULTIPLYAL               	00243     	-1        	LABEL     	(NOSEG)   
+INVALIDNUMBERMESSAGE     	00250     	-1        	LABEL     	(NOSEG)   
+BUFFERREQDESTBASE        	0026D     	-1        	LABEL     	(NOSEG)   
+BUFFERREQVALUE           	00291     	-1        	LABEL     	(NOSEG)   
+BUFFERINVALIDNUMBER      	002BF     	-1        	LABEL     	(NOSEG)   
+BUFFERLFCR               	002D9     	-1        	LABEL     	(NOSEG)   
+BUFFERBASE               	002DC     	-1        	LABEL     	(NOSEG)   
+BUFFERVALUE              	002E1     	-1        	LABEL     	(NOSEG)   
+===================================================================================================
+[ 22/05/2022  --  20:15:32 ] 
+< END >
+ 
